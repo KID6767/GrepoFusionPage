@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GrepoFusion — totalny remaster Grepolis</title>
+<meta name="description" content="GrepoFusion to totalny remaster Grepolis: UI w butelkowej zieleni i złocie, panel konfiguracji, statystyki, automatyzacje, integracje (HeliosPulse, Aegis, GRCRT, oficjalne dodatki) i raporty na forum.">
+<style>
+:root{
+  --bg:#0a1411;            /* głęboka butelkowa zieleń tła */
+  --bg-2:#0f1c18;
+  --card:#111f1a;
+  --line:#18352c;
+  --accent:#eac86d;        /* złoto */
+  --accent-2:#ffeb9a;
+  --muted:#b6c9c0;
+  --text:#f2f6f4;
+  --ok:#6ed19d;
+  --warn:#f6c177;
+  --bad:#f7768e;
+  --shadow: 0 12px 40px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:radial-gradient(1200px 900px at 10% -10%, #123226 0%, transparent 55%), radial-gradient(1000px 700px at 110% 10%, #1a3d2f 0%, transparent 60%), var(--bg); color:var(--text); font:16px/1.6 system-ui, Segoe UI, Inter, Arial, sans-serif}
+a{color:var(--accent); text-decoration:none}
+a:hover{color:var(--accent-2)}
+.container{max-width:1150px;margin:0 auto;padding:24px}
+.btn{display:inline-flex;gap:.6rem;align-items:center;border:1px solid var(--accent); color:#14231d; background:linear-gradient(180deg,var(--accent),#d7b252); font-weight:700; padding:12px 18px; border-radius:14px; box-shadow:var(--shadow); transition:.25s transform ease, .25s box-shadow ease}
+.btn:hover{transform:translateY(-2px); box-shadow:0 16px 45px rgba(234,200,109,.3)}
+.btn.alt{background:transparent;color:var(--accent);border-color:var(--line)}
+.badge{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.85rem;background:linear-gradient(180deg,#0e1a16,#0b1512)}
+.hero{position:relative; padding:64px 24px 40px; overflow:hidden; border-bottom:1px solid var(--line)}
+.grid{display:grid; gap:18px}
+.grid.col-3{grid-template-columns:repeat(3,1fr)}
+.grid.col-2{grid-template-columns:repeat(2,1fr)}
+@media (max-width:980px){.grid.col-3{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){.grid.col-3,.grid.col-2{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg, var(--card), #0d1915); border:1px solid var(--line); border-radius:18px; padding:20px; box-shadow:var(--shadow)}
+.card h3{margin:.2rem 0 0.6rem}
+.kicker{letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-size:.85rem}
+.h1{font-weight:900; font-size:clamp(30px,6vw,52px); line-height:1.1; margin:.3rem 0 1rem; color:var(--accent-2); text-shadow:0 2px 0 #000}
+.h2{font-weight:800; font-size:clamp(24px,3.7vw,34px); margin:0 0 12px}
+.p{color:#d8e6e1}
+.hr{height:1px;background:linear-gradient(90deg,transparent, var(--line), transparent); margin:24px 0}
+.list{margin:0;padding-left:18px}
+.list li{margin:.35rem 0}
+.check{color:var(--ok); margin-right:.5rem}
+.warn{color:var(--warn); margin-right:.5rem}
+.cross{color:var(--bad); margin-right:.5rem}
+
+/* logo (SVG) */
+.logo-wrap{display:flex;align-items:center;gap:14px}
+.logo{width:64px;height:64px;filter:drop-shadow(0 10px 30px rgba(234,200,109,.2))}
+.logo-ring{animation:spin 14s linear infinite; transform-origin:50% 50%}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* sekcja CTA nastepna */
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+
+/* „glow” ramek i fokus */
+.glow{position:relative}
+.glow:before{content:""; position:absolute; inset:-1px; border-radius:18px; background:radial-gradient(600px 200px at 20% -50%, rgba(234,200,109,.12), transparent 60%), radial-gradient(400px 200px at 120% 0%, rgba(52,196,140,.12), transparent 60%); z-index:-1; filter:blur(6px)}
+.footer{opacity:.65; font-size:.9rem; text-align:center; padding:24px}
+
+/* mini chipy */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{border:1px dashed var(--line); padding:6px 10px; border-radius:999px; color:#cfe2da; background:linear-gradient(180deg,#0e1a16,#0a1411)}
+kbd{padding:.2rem .45rem; border:1px solid var(--line); background:#0d1915;border-radius:6px}
+.small{font-size:.92rem;color:#cfe2da}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <div class="logo-wrap">
+      <!-- proste logo w SVG (słońce + pierścienie) -->
+      <svg class="logo" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0" stop-color="#ffefb0"/>
+            <stop offset="1" stop-color="#eac86d"/>
+          </linearGradient>
+        </defs>
+        <circle cx="48" cy="48" r="16" fill="url(#g)"/>
+        <g class="logo-ring" fill="none" stroke="#eac86d" stroke-opacity=".75">
+          <circle cx="48" cy="48" r="28" stroke-width="1.5"/>
+          <circle cx="48" cy="48" r="38" stroke-width="1.2" stroke-dasharray="6 6"/>
+        </g>
+      </svg>
+      <div>
+        <div class="badge">Butelkowa zieleń • Złoto • Remaster</div>
+        <h1 class="h1">GrepoFusion</h1>
+        <div class="p">Totalny remaster Grepolis: jedna nakładka, która łączy **wszystkie** najlepsze mody, automatyzacje i statystyki — z piękną oprawą i panelem konfiguracji.</div>
+      </div>
+    </div>
+
+    <div class="cta" style="margin-top:18px">
+      <a class="btn" href="#install">Zainstaluj teraz</a>
+      <a class="btn alt" href="#features">Zobacz funkcje</a>
+      <span class="badge">HeliosPulse • Aegis • GRCRT • integracje oficjalne</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- kluczowe korzyści -->
+  <section class="grid col-3" id="features" style="margin-top:28px">
+    <article class="card glow">
+      <div class="kicker">UI</div>
+      <h3>Remaster w butelkowej zieleni</h3>
+      <p class="p">Spójny, elegancki motyw (zieleń + złoto), nowe ikonki, schludne ramki, responsywność. Aegis w środku — bez dodatkowych instalek.</p>
+      <div class="chips">
+        <span class="chip">ciemny motyw</span>
+        <span class="chip">złote akcenty</span>
+        <span class="chip">własne logo</span>
+      </div>
+    </article>
+    <article class="card glow">
+      <div class="kicker">Automatyzacje</div>
+      <h3>Panel asystentów & helperów</h3>
+      <p class="p">Obecność, aktywność, raporty dzienne, auto-builder, auto-recruit, farmy, handel oraz szybkie publikacje na forum.</p>
+      <div class="chips">
+        <span class="chip">HeliosPulse</span>
+        <span class="chip">Raporty BBCode</span>
+        <span class="chip">Forum sojuszu</span>
+      </div>
+    </article>
+    <article class="card glow">
+      <div class="kicker">Statystyki</div>
+      <h3>Fusion = centrum danych</h3>
+      <p class="p">Zrzuty sojuszu i sojuszników, delty punktów/miast, TOP OFF/DEF (GRCRT), aktywność & nieobecności — wszystko w jednym miejscu.</p>
+      <div class="chips">
+        <span class="chip">GRCRT feed</span>
+        <span class="chip">analizy dzienne</span>
+        <span class="chip">JSON & BBCode</span>
+      </div>
+    </article>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- integracje -->
+  <section class="grid col-2">
+    <article class="card">
+      <div class="kicker">Integracje</div>
+      <h2 class="h2">Wszystko w jednym: oficjalne + społecznościowe</h2>
+      <ul class="list">
+        <li><span class="check">✔</span><b>HeliosPulse</b> — obecność, aktywność, raporty dzienne, Google Sheets + AppScript</li>
+        <li><span class="check">✔</span><b>Aegis</b> — kompletny remaster UI (zieleń + złoto) + BBCode forum</li>
+        <li><span class="check">✔</span><b>GRCRT</b> — punkty OFF/DEF, topki w raportach</li>
+        <li><span class="check">✔</span><b>Oficjalne dodatki</b> (WordPress/Forum Grepolis) — legalne integracje</li>
+        <li><span class="check">✔</span><b>Parsery & konwertery</b> — BBCode ↔ HTML, wklejki raportów</li>
+      </ul>
+      <p class="small">Sterowanie modułami z jednego panelu — włącz/wyłącz co chcesz, by zachować płynność gry.</p>
+    </article>
+
+    <article class="card">
+      <div class="kicker">Jak to działa?</div>
+      <h2 class="h2">Panel Fusion + automatyczne raporty</h2>
+      <ol class="list">
+        <li>Instalujesz userscript w Tampermonkey.</li>
+        <li>W panelu <b>GrepoFusion</b> ustawiasz token i WebApp URL (Google).</li>
+        <li>Statystyki lecą do arkusza, a <b>Raport Dzienny</b> masz gotowy w BBCode do forum.</li>
+        <li>Włączasz dodatkowe moduły (Aegis, GRCRT, auto-builder, itp.).</li>
+      </ol>
+      <div class="chips" style="margin-top:8px">
+        <span class="chip">1 klik — publikuj na forum</span>
+        <span class="chip">JSON dla devów</span>
+        <span class="chip">BBCode dla sojuszu</span>
+      </div>
+    </article>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- bezpieczeństwo / fair play -->
+  <section class="grid col-3">
+    <article class="card">
+      <div class="kicker">Bezpieczeństwo</div>
+      <h3>Transparentna konfiguracja</h3>
+      <p class="p">Widzisz, co jest włączone. Każdy moduł możesz wyłączyć jednym kliknięciem — pełna kontrola po Twojej stronie.</p>
+    </article>
+    <article class="card">
+      <div class="kicker">Płynność</div>
+      <h3>Lekka nakładka</h3>
+      <p class="p">Minimalny narzut: CSS i moduły wczytywane leniwie. Fusion nie dławi gry, bo nie musi — to Ty decydujesz, co działa.</p>
+    </article>
+    <article class="card">
+      <div class="kicker">Fair play</div>
+      <h3>Legalne integracje</h3>
+      <p class="p">Fusion wspiera legalne integracje z oficjalnych źródeł — a moduły „smart” projektujemy tak, by nie łamały zasad serwera.</p>
+    </article>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- instalacja -->
+  <section id="install" class="card glow">
+    <div class="kicker">Instalacja</div>
+    <h2 class="h2">3 kroki i gotowe</h2>
+    <ol class="list">
+      <li>Zainstaluj <b>Tampermonkey</b> (Chrome/Edge/Firefox).</li>
+      <li>Wejdź w link „Zainstaluj GrepoFusion” i kliknij <b>Install</b>.</li>
+      <li>W grze otwórz panel <b>GrepoFusion → Ustawienia</b> i wklej <b>WebApp URL</b> z Google App Script (dla HeliosPulse).</li>
+    </ol>
+    <div class="cta" style="margin-top:10px">
+      <a class="btn" href="#">Zainstaluj GrepoFusion</a>
+      <a class="btn alt" href="#">Dokumentacja & FAQ</a>
+    </div>
+    <p class="small" style="margin-top:10px">Tip: jeśli używasz GitHub Pages, podlinkuj też stronę sojuszu: <code>https://twoj-user.github.io/GrepoFusion/</code></p>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- FAQ -->
+  <section class="grid col-2">
+    <article class="card">
+      <div class="kicker">FAQ</div>
+      <h3>Czy potrzebuję osobno HeliosPulse i Aegis?</h3>
+      <p class="p">Nie — GrepoFusion już je zawiera. W panelu możesz je włączyć/wyłączyć i skonfigurować.</p>
+      <h3>Czy wspiera GRCRT?</h3>
+      <p class="p">Tak. GrepoFusion pobiera topki OFF/DEF i wplata je w raporty dzienne (jeśli masz GRCRT).</p>
+    </article>
+    <article class="card">
+      <div class="kicker">FAQ</div>
+      <h3>Czy da się publikować automatycznie na forum?</h3>
+      <p class="p">Tak. Raporty dzienne generowane są w BBCode gotowym do wklejenia, a moduł „autofill” przyspiesza publikację.</p>
+      <h3>Jak zmienić kolory i logo?</h3>
+      <p class="p">W CSS (na górze pliku) zmień zmienne <code>--bg</code>, <code>--accent</code> i podmień SVG logotypu. Prościej się nie da.</p>
+    </article>
+  </section>
+
+  <p class="footer">GrepoFusion — totalny remaster Grepolis. Spójny wygląd, automatyzacje, statystyki i forum — wszystko w jednej nakładce.</p>
+</main>
+
+</body>
+</html>
